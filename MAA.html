@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Masjid Al-Akbar</title>
+  </head>
+  <body>
+    <canvas id="masjid" width="1000" height="800" style="border: 1px solid black"></canvas>
+
+    <script>
+      // inisialisasi Canvas  
+      let canvas = document.getElementById('masjid');
+      let context = canvas.getContext('2d');
+
+      // function background langit dan rumput
+      function drawBackground() {
+        canvas.style.backgroundColor = 'skyblue';
+        context.fillStyle = 'green';
+        context.fillRect(0, canvas.height / 2 + 300, canvas.width, canvas.height);
+      }
+      drawBackground();
+
+      // function matahari
+      function drawSun() {
+        let sunX = 60;
+        let sunY = 60;
+        let sunRadius = 50;
+
+        context.beginPath();
+        context.arc(sunX, sunY, sunRadius, 0, 2 * Math.PI);
+        context.fillStyle = 'yellow';
+        context.fill();
+        context.closePath();
+      }
+      drawSun();
+
+      //function segitiga
+      function segitiga(x, y, alas) {
+        let gradient = context.createLinearGradient(x - alas, y + 90, x + alas, y + 90);
+        gradient.addColorStop(0, 'yellow'); // Warna awal gradiasi
+        gradient.addColorStop(1, 'green'); // Warna akhir gradiasi
+
+        context.beginPath();
+        context.moveTo(x, y + 90);
+        context.lineTo(x - alas, y + 190);
+        context.lineTo(x + alas, y + 190);
+        context.closePath();
+        context.fillStyle = gradient; // Menggunakan gradiasi sebagai warna isi segitiga
+        context.fill();
+      }
+
+      //function trapesium kebalik
+      function trapesium(x, y, upperWidth, lowerWidth) {
+        let gradient = context.createLinearGradient(x - upperWidth / 2, y, x + upperWidth / 2, y + 30);
+        gradient.addColorStop(0, 'yellow'); // Warna awal gradiasi
+        gradient.addColorStop(1, 'red'); // Warna akhir gradiasi
+
+        context.beginPath();
+        context.moveTo(x - upperWidth / 2, y);
+        context.lineTo(x + upperWidth / 2, y);
+        context.lineTo(x + lowerWidth / 2, y + 30);
+        context.lineTo(x - lowerWidth / 2, y + 30);
+        context.closePath();
+        context.fillStyle = gradient; // Menggunakan gradiasi sebagai warna isi trapesium
+        context.fill();
+      }
+
+      //function kotak-kotak di menara
+      function kotakMenara(x, y, width, height, color) {
+        context.fillStyle = color;
+        context.fillRect(x, y, width, height);
+      }
+
+      //function menara yang di dalam nya dipanggil beberapa function
+      function menara(x, y, alas, squareWidth, squareHeight) {
+        // Memanggil function segitiga
+        segitiga(x, y, alas);
+
+        // Memanggil function kotakMenara
+        kotakMenara(x - squareWidth / 2, y + 190, squareWidth, squareHeight, 'red');
+
+        // Memanggil function trapesium
+        trapesium(x, y + 190 + squareHeight, squareWidth, squareWidth - 40);
+
+        // Memanggil function kotakMenara
+        kotakMenara(x - squareWidth / 2 + 20, y + 190 + squareHeight + 30, squareWidth - 40, 50, 'green');
+
+        // Memanggil function kotakMenara
+        kotakMenara(x - squareWidth / 2, y + 285, squareWidth, squareHeight, 'red');
+
+        // Memanggil function trapesium
+        trapesium(x, y + 205 + squareHeight + 80, squareWidth, squareWidth - 40);
+
+        // Memanggil function kotakMenara
+        kotakMenara(x - squareWidth / 2 + 20, y + 190 + squareHeight + 125, squareWidth - 40, 80, 'green');
+
+        // Memanggil function kotakMenara
+        kotakMenara(x - squareWidth / 2, y + 400, squareWidth, squareHeight, 'red');
+
+        // Memanggil function trapesium
+        trapesium(x, y + 205 + squareHeight + 195, squareWidth, squareWidth - 40);
+
+        // Memanggil function kotakMenara
+        kotakMenara(x - squareWidth / 2 + 20, y + 190 + squareHeight + 240, squareWidth - 40, 80, 'green');
+
+        // Memanggil function kotakMenara
+        kotakMenara(x - squareWidth / 2 + 5, y + 190 + squareHeight + 270, squareWidth - 10, 145, 'red');
+      }
+
+      // memanggil function menara dengan ukuran besar di sebelah kiri
+      menara(150, 70, 50, 120, 25);
+
+      // memanggil function menara dengan ukuran kecil di sebelah kiri
+      menara(300, 120, 30, 80, 15);
+
+      // memanggil function menara dengan ukuran kecil di sebelah kanan
+      menara(700, 120, 30, 80, 15);
+
+      // memanggil function menara dengan ukuran besar di sebelah kanan
+      menara(850, 70, 50, 120, 25);
+
+      // function kubah
+      function kubah(x, y, r, color1, color2, withEdge = true) {
+        let gradient = context.createLinearGradient(x - r, y - r, x + r, y + r);
+        gradient.addColorStop(0, color1); // Warna di titik awal (kubah atas)
+        gradient.addColorStop(1, color2); // Warna di titik akhir (kubah bawah)
+
+        // Membuat kubah
+        context.fillStyle = gradient;
+        context.beginPath();
+        context.arc(x, y, r, Math.PI, 2 * Math.PI);
+        context.closePath();
+
+        // Menutup kubah
+        context.moveTo(x - r, y);
+        context.lineTo(x + r, y);
+
+        // Mewarnai dan menggaris kubah
+        context.lineWidth = r / 10;
+        context.fill();
+
+        if (withEdge) {
+          context.beginPath();
+          context.moveTo(x, y - r);
+          context.lineTo(x, y - r - r / 4);
+          context.stroke();
+          context.closePath();
+
+          context.beginPath();
+          context.arc(x, y - r - r / 4 - r / 4, r / 4, (1 / 4) * Math.PI, (3 / 2) * Math.PI);
+          context.stroke();
+          context.closePath();
+        }
+      }
+      // Contoh pemanggilan fungsi createDomeLinearGradiasi
+      kubah(canvas.width / 2, canvas.height / 2, 120, 'yellow', 'red', true);
+
+      // function atasPintu
+      function atasPintu(x, y, r, color) {
+        // Membuat atas pintu
+        context.fillStyle = color;
+        context.beginPath();
+        context.arc(x, y, r, Math.PI, 2 * Math.PI);
+        context.closePath();
+
+        // Menutup atas pintu
+        context.moveTo(x - r, y);
+        context.lineTo(x + r, y);
+
+        // Mewarnai dan menggaris atas pintu
+        context.lineWidth = r / 10;
+        context.fill();
+      }
+
+      // Fungsi untuk menggambar kotak
+      function drawSquare(x, y, width, height, color) {
+        context.fillStyle = color;
+        context.fillRect(x, y, width, height);
+      }
+
+      // Memanggil function drawSquare untuk menggambar 2 kotak di bawah kubah
+      drawSquare(canvas.width / 2 - 120, canvas.height / 2, canvas.width / 2 - 260, 30, 'brown');
+      drawSquare(canvas.width / 2 - 150, canvas.height / 2 + 30, canvas.width / 2 - 200, 40, 'red');
+
+      // Memanggil function drawSquare untuk menggambar kotak yang lebih besar di bawah kubah
+      drawSquare(canvas.width / 2 - 250, canvas.height / 2 + 70, canvas.width / 2 + 5, 260, 'orange');
+
+      // Memanggil function drawSquare untuk menggambar tangga
+      drawSquare(canvas.width / 2 - 270, canvas.height / 2 + 330, canvas.width / 2 + 40, 15, 'red');
+      drawSquare(canvas.width / 2 - 290, canvas.height / 2 + 345, canvas.width / 2 + 80, 15, 'red');
+
+      // function pintu
+      function pintu(x, y, width, height, color) {
+        // Menggambar pintu
+        drawSquare(x, y, width, height, color);
+        // Menggambar atasPintu dengan radius setengah tinggi pintu agar atasPintu dan pintu saling bersinggungan
+        atasPintu(x + width / 2, y, height / 2, color);
+      }
+
+      // memanggil fungsi pintu untuk menggambar pintu
+      // mengganti koordinat x, y untuk menyesuaikan posisi pintu di dalam bangunan masjid
+      pintu(300, canvas.height / 2 + 230 + 25, 75, 75, 'brown');
+      pintu(450, canvas.height / 2 + 230, 100, 100, 'brown');
+      pintu(630, canvas.height / 2 + 230 + 25, 75, 75, 'brown');
+
+      // menambahkan tulisan
+      context.fillStyle = 'black';
+      context.font = '48px Helvetica';
+      context.fillText('Masjid Al-Akbar', canvas.width / 2 - 100, canvas.height / 2 + 150, 200);
+    </script>
+  </body>
+</html>
